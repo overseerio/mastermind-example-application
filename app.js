@@ -4,6 +4,7 @@ var http    = require('http')
   , Router  = require('./router')
   , DB    = require('./db')
   , conf = require('./config.json')
+  , overseer = require('./node-overseer')({ key: conf.key })
 
 var blog = new DB();
 var router = new Router();
@@ -32,8 +33,13 @@ router.get('^/posts/new/?$', function(req, res) {
   httpUtils.renderHtml('post/new.html', res, options);
 })
 
+var counter = 0;
 // Add a new post
 router.post('^/posts/?$', function(req, res) {
+  counter++
+  overseer.widget('test').post({ time: 0, value: counter }, function (err) {
+    if (err) console.log(err.message)
+  })
   httpUtils.parseBody(req, function(body) {
     var post = {
       title: body.title,
