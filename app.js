@@ -36,8 +36,7 @@ router.get('^/posts/new/?$', function(req, res) {
 var counter = 0;
 // Add a new post
 router.post('^/posts/?$', function(req, res) {
-  counter++
-  overseer.widget('test').post({ time: 0, value: counter }, function (err) {
+  overseer.widget('fixedtime').post({ value: 1 }, function (err) {
     if (err) console.log(err.message)
   })
   httpUtils.parseBody(req, function(body) {
