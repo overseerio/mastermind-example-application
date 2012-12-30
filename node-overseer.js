@@ -87,7 +87,7 @@ Widget.prototype = {
       if (self._code) { 
         self._post(self._path(), data, next) 
       } else {
-        self._setPostUrl(self._name, function (err) {
+        self._setPostUrl(function (err) {
           if (err) {
             throw err
           }
