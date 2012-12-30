@@ -1,13 +1,13 @@
-//******************************************************************************************
+//******************************************************************
 // Overseer.io
 // usage: var overseer = require('path/to/node-overseerio')({ key: API_KEY })
-//******************************************************************************************
+//******************************************************************
 
 var request = require('request')
 
-//******************************************************************************************
+//******************************************************************
 // Overseerio sending
-//******************************************************************************************
+//******************************************************************
 
 function Overseer(options) {
   this._key = options.key
@@ -76,30 +76,60 @@ var Widget = function (overseer, name) {
 }
 
 Widget.prototype = {
-    _code: null
+    _dirty: false
+  , _code: null
   , _path: function () {
       if (!this._code) return null
       else return '/data/' + this._code
     }
   , post: function (data, next) {
       var self = this
-      if (self._code) self._overseer._post(self._path(), data, next)
-      else {
-        self._overseer._getPostUrl(self._name, function (err, code){
-          if (err) throw err
-          self._code = code
+      if (self._code) { 
+        self._post(self._path(), data, next) 
+      } else {
+        self._setPostUrl(self._name, function (err) {
+          if (err) {
+            throw err
+          }
           self._post(self._path(), data, next)
         })
       }
     }
   , _post: function (posturl, data, next) {
-      this._overseer._post(posturl, data, next)
+      //if error, requery and set cache
+      var self = this
+      this._overseer._post(posturl, data, function (err) {
+        if (err && !self._dirty) { 
+          self._code = null
+          self._dirty = true
+          self.post(data, next)
+        } else if (err) {
+          throw err
+        } else {
+          self._dirty = false
+          next()
+        }
+      })
+    }
+  , _setPostUrl: function (next) {
+      var self = this
+      self._overseer._getPostUrl(self._name, function (err, code) {
+        if (err) { 
+          throw err
+        } else if (!code) {
+          self._code = null
+          next(new Error("Specified widget doesn't exist: " + self._name))
+        } else {
+          self._code = code
+          next()
+        }
+      })
     }
 }
 
-//******************************************************************************************
+//******************************************************************
 // Export
-//******************************************************************************************
+//******************************************************************
 
 function overseer (options) {
   if (!options.key) return false
