@@ -5,4 +5,4 @@ A simple example application that uses a dashboard on [Mastermind](https://githu
 
 ---
 
-© 2012-2013 Alex Toney, Charles Feng, and Nick Kucharski. Shared under the [MIT License](http://www.opensource.org/licenses/MIT).
+© 2012-2013 Alex Toney, Charles Feng, and Nick Kucharski. Shared under the [GPLv3 License](http://opensource.org/licenses/GPL-3.0).
